@@ -1,0 +1,14 @@
+Dockerfile
+.dockerignore
+.git
+.gitignore
+node_modules
+dist
+.env.staging
+.env.pilot
+.env
+.env.dev
+.env.local
+deploy
+bash-script
+yarn.lock

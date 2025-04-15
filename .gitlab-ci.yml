@@ -1,0 +1,11 @@
+stages: 
+  - deploy_stage
+deploy:
+  stage: deploy_stage
+  tags:
+    - srvstage-hnth-95-runner
+  only:
+    - stage
+  script:
+    - chmod +x ./bash/stage.sh
+    - ./bash/stage.sh

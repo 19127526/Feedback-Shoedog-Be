@@ -1,7 +1,7 @@
 import {forwardRef, Inject, Injectable} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LogFeedBackEntity } from '../entities/log-feedback.entity';
+import { LogFeedBackEntity, RATE_FEEDBACK } from '../entities/log-feedback.entity';
 import { LogSocketEntity } from '../entities/log-socket.entity';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { SocialGatewayV2 } from '../events/social-realtime.gateway';
@@ -29,17 +29,22 @@ export class SocialService  {
     }
 
     createLogSocket(socketId: string): Promise<any> {
-        return this.logSocketRepository.create({
+        return this.logSocketRepository.save({
            socket_id: socketId
         }) as any
     }
 
     async createFeedback(body: CreateFeedbackDto): Promise<any> {
-        await this.logFeedbackRepository.create({
-            note: JSON.stringify(body),
-            status: 0
-        })
-        await this.socialGatewayV2.emitSendNotiFeedback(body)
-        return body
+        try {
+            const result = await this.logFeedbackRepository.save({
+                note: JSON.stringify(body),
+                status: 0
+            });
+            await this.socialGatewayV2.emitSendNotiFeedback(body)
+            return result;
+        }
+        catch (err) {
+            console.error('Insert error:', err);
+        }
     }
 }

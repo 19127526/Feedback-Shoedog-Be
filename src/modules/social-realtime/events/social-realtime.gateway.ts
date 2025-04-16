@@ -8,12 +8,12 @@ import {
     OnGatewayDisconnect, MessageBody,
 } from '@nestjs/websockets';
 import {Socket, Server} from 'socket.io';
-import {Inject, Logger, UseInterceptors, forwardRef} from '@nestjs/common';
+import {Logger, UseInterceptors, } from '@nestjs/common';
 import {CONSTANT_V2, EMIT_TYPE} from 'src/constant/common.const';
 import {SocketIOInterceptor} from 'src/core/interceptors/socketio.interceptor';
-import {ISocialService} from '../services/isocial-realtime.service';
 import {encryptString} from "../../../utils/helper";
-import {CommonEmitDto} from "../../../../dist/modules/social-reatime/dto/common-emit.dto";
+import { CommonEmitDto } from '../dto/common-emit.dto';
+import { SocialService } from '../services/social-realtime.service';
 
 @WebSocketGateway({
     cors: true,
@@ -32,8 +32,7 @@ export class SocialGatewayV2 implements OnGatewayInit, OnGatewayConnection, OnGa
 
 
     constructor(
-        @Inject(forwardRef(() => 'ISocialService'))
-        private readonly socialService: ISocialService,
+        private readonly socialService: SocialService,
     ) {
     }
 

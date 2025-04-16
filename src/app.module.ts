@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
-import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import { ConfigModule } from '@nestjs/config';
-import { LoggerModule } from './core/logger/logger.module';
 import { config } from './config/config';
-import { SocialModule } from './modules/social-reatime/social-realtime.module';
-import { DatabaseModule } from './core/database/databases.module';
-import { AuthGuard } from './modules/authentication/auth.guard';
-import { JwtModule } from '@nestjs/jwt';
-import {AllExceptionFilter} from "@devhcm/core-nestjs-fastify";
-
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SocialModule } from './modules/social-realtime/social-realtime.module';
+import { LogFeedBackEntity } from './modules/social-realtime/entities/log-feedback.entity';
+import { LogSocketEntity } from './modules/social-realtime/entities/log-socket.entity';
 
 @Module({
     imports: [
@@ -18,16 +14,20 @@ import {AllExceptionFilter} from "@devhcm/core-nestjs-fastify";
                 config,
             ],
         }),
-        DatabaseModule.forRoot(config().connectionsDB),
-        SocialModule,
-        JwtModule
+        TypeOrmModule.forRoot({
+            type: 'mysql',
+            host: '172.16.247.16',
+            port: 3306,
+            username: 'hnth',
+            password: 'hnth6789mytv',
+            database: 'hnth_mytv',
+            entities: [LogFeedBackEntity, LogSocketEntity],
+            logging: true
+        }),
+        SocialModule
     ],
     controllers: [],
     providers: [
-        {
-            provide: APP_GUARD,
-            useClass: AuthGuard,
-        },
     ],
 })
 export class AppModule {}

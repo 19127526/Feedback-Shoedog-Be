@@ -16,13 +16,13 @@ import { LogSocketEntity } from './modules/social-realtime/entities/log-socket.e
         }),
         TypeOrmModule.forRoot({
             type: 'mysql',
-            host: '172.16.247.16',
+            host: 's88d41.cloudnetwork.vn',
             port: 3306,
-            username: 'hnth',
-            password: 'hnth6789mytv',
-            database: 'hnth_mytv',
+            username: 'sho27414_shoedogdatabase',
+            password: 'shoedog1994',
+            database: 'sho27414_shoedogdatabase',
             entities: [LogFeedBackEntity, LogSocketEntity],
-            logging: true
+            logging: false
         }),
         SocialModule
     ],

@@ -11,9 +11,10 @@ import {Socket, Server} from 'socket.io';
 import {Logger, UseInterceptors, } from '@nestjs/common';
 import {CONSTANT_V2, EMIT_TYPE} from 'src/constant/common.const';
 import {SocketIOInterceptor} from 'src/core/interceptors/socketio.interceptor';
-import {encryptString} from "../../../utils/helper";
+import { decryptString } from '../../../utils/helper';
 import { CommonEmitDto } from '../dto/common-emit.dto';
 import { SocialService } from '../services/social-realtime.service';
+import { SendResultFeedbackDto } from '../dto/send-result-feedback.dto';
 
 @WebSocketGateway({
     cors: true,
@@ -50,10 +51,11 @@ export class SocialGatewayV2 implements OnGatewayInit, OnGatewayConnection, OnGa
 
         if (query && query.code) {
             const socketId = client.id
-            const encryptValue = encryptString(query.code)
-            const parseValue = JSON.parse(encryptValue) ?? null
+            const decryptValue = decryptString(query.code)
+            const parseValue = JSON.parse(decryptValue) ?? null
             if(parseValue && parseValue?.status === 1994) {
-                this.socialService.createLogSocket(socketId)
+                await this.socialService.createLogSocket(socketId)
+                const newData = await this.socialService.getNewLogFeedBack()
                 client.emit(
                     EMIT_TYPE.RESULT_CONNECT,
                     {
@@ -62,6 +64,16 @@ export class SocialGatewayV2 implements OnGatewayInit, OnGatewayConnection, OnGa
                         result: 0,
                     } as CommonEmitDto
                 );
+                if(newData) {
+                    client.emit(
+                        EMIT_TYPE.RESULT_EVENT_SEND_FEEDBACK,
+                        {
+                            data: newData,
+                            message: 'Bạn có hóa đơn mới cần đánh giá',
+                            result: 0,
+                        } as CommonEmitDto
+                    )
+                }
             } else {
                 client.emit(
                     EMIT_TYPE.RESULT_CONNECT,
@@ -86,22 +98,40 @@ export class SocialGatewayV2 implements OnGatewayInit, OnGatewayConnection, OnGa
 
 
 
-    async emitSendNotiFeedback(body: any) {
+    //send app when kiot viet received bill
+    async emitSendNotiFeedback(billInfo: any) {
         this.server.emit(
-            EMIT_TYPE.RESULT_SEND_NOTI_FEEDBACK,
+            EMIT_TYPE.RESULT_EVENT_SEND_FEEDBACK,
             {
-                data: body,
-                message: 'success',
+                data: billInfo,
+                message: 'Bạn có hóa đơn mới cần đánh giá',
                 result: 0,
             } as CommonEmitDto
         )
         return;
     }
 
-    @SubscribeMessage(CONSTANT_V2.EVENT_SEND_RESULT_FEEDBACK)
-    async handleSendFeedback(@ConnectedSocket() client: Socket, @MessageBody() body: {socket_id: number}) {
-        if (client && client.id && body?.socket_id) {
-
+    @SubscribeMessage(CONSTANT_V2.EVENT_SEND_SUBMIT_FEEDBACK)
+    async handleSendFeedback(@ConnectedSocket() client: Socket, @MessageBody() body: SendResultFeedbackDto) {
+        if (client && client.id && body?.socket_id && body?.id && body?.feedback) {
+            const result  = await this.socialService.updateFeedbackById(body)
+            client.emit(
+                EMIT_TYPE.RESULT_EVENT_SEND_SUBMIT_FEEDBACK,
+                {
+                    data: result.data,
+                    message: result.message,
+                    result: result?.isError === true ? -1 : 0,
+                } as CommonEmitDto
+            )
+        } else {
+            client.emit(
+                EMIT_TYPE.RESULT_EVENT_SEND_SUBMIT_FEEDBACK,
+                {
+                    data: null,
+                    message: 'Vui lòng truyền đầy đủ thông tin',
+                    result: -1,
+                } as CommonEmitDto
+            )
         }
     }
 
@@ -109,6 +139,7 @@ export class SocialGatewayV2 implements OnGatewayInit, OnGatewayConnection, OnGa
     async handleDisconnect(@ConnectedSocket() client: Socket) {
         if (client && client.id) {
             this.socialService.removeLogSocket(client.id)
+            client.disconnect()
             client.emit(
                 EMIT_TYPE.RESULT_CONNECT,
                 {

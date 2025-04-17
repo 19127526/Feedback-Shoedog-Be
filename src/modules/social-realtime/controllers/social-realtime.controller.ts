@@ -14,9 +14,9 @@ export class SocialRealtimeController   {
 
     @Post('/feedback')
     @ApiOperation({ description: 'API tạo feedback' })
-    public async createFeedback(@Body() body: CreateFeedbackDto) {
+    public async createFeedback(@Body() billInfo: CreateFeedbackDto) {
         try {
-            const result = await this.socialService.createFeedback(body);
+            const result = await this.socialService.createFeedback(billInfo);
             return {
                 data: result,
                 message: 'success'

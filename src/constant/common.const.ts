@@ -1,5 +1,3 @@
-
-
 export enum DB_TYPE {
     DB_CONTENT_READ = 'DB_CONTENT_READ',
     DB_CONTENT_WRITE = 'DB_CONTENT_WRITE',
@@ -30,16 +28,18 @@ export enum ACCOUNT_DEFAULT {
 }
 
 
-
-
 export enum CONSTANT_V2 {
     EVENT_CONNECTION = 'connection',
     EVENT_DISCONNECT = 'disconnect',
-    EVENT_SEND_RESULT_FEEDBACK = 'send_feedback',
+    //app send feedback
+    EVENT_SEND_SUBMIT_FEEDBACK = 'send_submit_feedback',
 }
 
 
-export const EMIT_TYPE = {
-    RESULT_CONNECT:`result_connect`,
-    RESULT_SEND_NOTI_FEEDBACK: 'result_send_noti_feedback'
+export enum EMIT_TYPE {
+    RESULT_CONNECT = `result_connect`,
+    //api send result send feedback to app
+    RESULT_EVENT_SEND_FEEDBACK = 'result_send_feedback',
+    //api send
+    RESULT_EVENT_SEND_SUBMIT_FEEDBACK = 'result_send_submit_feedback'
 }

@@ -50,18 +50,22 @@ export class SocialService {
 
 
     //Save feedback when start app
-    async createFeedback(billInfo: any): Promise<any> {
+    async createFeedback(billInfo: {Invoice: any}): Promise<any> {
         try {
-            const data = await this.logFeedbackRepository.save({
-                note: JSON.stringify(billInfo),
-                status: 0,
-                create_date: new Date().toString()
-            });
-            const result = await this.getNewLogFeedBack()
-            await this.socialGatewayV2.emitSendNotiFeedback(result);
-            return data;
+            if(billInfo && billInfo.Invoice) {
+                const data = await this.logFeedbackRepository.save({
+                    note: JSON.stringify(billInfo),
+                    status: 0,
+                    create_date: new Date().toString(),
+                    user_name: billInfo?.Invoice?.Seller?.GivenName ?? ''
+                });
+                const result = await this.getNewLogFeedBack()
+                await this.socialGatewayV2.emitSendNotiFeedback(result);
+                return data;
+            }
+            throw new Error('Body không hợp lệ')
         } catch (err) {
-            console.error('Insert error:', err);
+           throw err
         }
     }
 

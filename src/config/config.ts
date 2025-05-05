@@ -73,7 +73,7 @@ export const config = () => ({
     appUrl: envVars.APP_URL,
     appHost: envVars.APP_HOST,
     baseUrl: envVars.BASE_URL,
-
+    appDomain: envVars.APP_DOMAIN,
     secretJwt: envVars.SECRECT_KEY_AUTHEN_CMS,
 
     debugMode: envVars.DEBUG_MODE ? parseInt(envVars.DEBUG_MODE) : 0,

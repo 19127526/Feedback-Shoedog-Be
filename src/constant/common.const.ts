@@ -35,6 +35,37 @@ export enum CONSTANT_V2 {
     EVENT_SEND_SUBMIT_FEEDBACK = 'send_submit_feedback',
 }
 
+export const FEEDBACK_TYPE = [
+    {
+        label: 'Không nhiệt tình',
+        value: 1,
+    },
+    {
+        label: 'Tạm được',
+        value: 2,
+    },
+    {
+        label: 'Nhiệt tình',
+        value: 3,
+    },
+    {
+        label: 'Rất nhiệt tình',
+        value: 4,
+    },
+];
+
+export const STATUS_TYPE = [
+    {
+        label: 'Đã đánh giá',
+        value: 1,
+    },
+    {
+        label: 'Chưa đánh giá',
+        value: 0,
+    },
+];
+
+
 
 export enum EMIT_TYPE {
     RESULT_CONNECT = `result_connect`,

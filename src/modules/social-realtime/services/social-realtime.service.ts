@@ -236,7 +236,6 @@ export class SocialService {
             { header: 'Trạng thái', key: 'status_label' },
         ];
 
-        console.log('items', items)
 
         let outputFilePath = '/public/static/' + 'feedback' + `/${new Date().getFullYear()}` + `/${new Date().getMonth() + 1}` + '/export';
         let path = outputFilePath + '/export_list.xlsx';
